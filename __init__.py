@@ -15,13 +15,13 @@
 #  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 # #####END GPL LICENSE BLOCK #####
-
+# contributed to by meta-androcto (minir code, materials collection)
 bl_info = {
 	"name": "Material Library Cycles",
 	"author": "Mackraken",
-	"version": (0, 5, 6),
-	"blender": (2, 7, 2),
-	"api": 60995,
+	"version": (1, 0, 0),
+	"blender": (2, 77, 0),
+
 	"location": "Properties > Material",
 	"description": "Material Library VX",
 	"warning": "",

@@ -18,7 +18,7 @@
 
 bl_info = {
 	"name": "Material Library Cycles",
-	"author": "Mackraken (mackraken2023@hotmail.com)",
+	"author": "Mackraken",
 	"version": (0, 5, 6),
 	"blender": (2, 7, 2),
 	"api": 60995,
@@ -29,8 +29,12 @@ bl_info = {
 	"tracker_url": "",
 	"category": "Material"}
 
-
-import bpy, os, json
+import zipfile, urllib.request, os, sys, re
+import csv, codecs
+import collections
+import subprocess
+import webbrowser
+import bpy, json
 from bpy.props import *
 
 print (30*"-")
@@ -995,7 +999,12 @@ class matlibvxPanel(bpy.types.Panel):
 		row.operator("matlib.operator", icon="FILE_PARENT", text="").cmd="FILTER_SET"
 		row.operator("matlib.operator", icon="ZOOMIN", text="").cmd="FILTER_ADD"
 		row.operator("matlib.operator", icon="ZOOMOUT", text="").cmd="FILTER_REMOVE"
-		
+
+		#update
+		row = layout.row(align=True)
+		text = "Update from Web"
+		row.operator("script.update_materials_addon", icon="URL", text="Update")
+
 		#prefs
 		if matlib.show_prefs:
 			row = layout.row()
@@ -1012,8 +1021,40 @@ class matlibvxPanel(bpy.types.Panel):
 				row.label(matlib.current_library.name)
 			else:
 				row.label("Library not found!.")
-				
-classes = [matlibvxPanel, matlibOperator, matlibLibsMenu, matlibCatsMenu]
+
+class UpdateMaterialsAddon(bpy.types.Operator):
+	bl_idname = "script.update_materials_addon"
+	bl_label = "Update Blender-Materials-Addon"
+	bl_description = "Downloads, updates and check out Blender-Materials-Addon (12 meg)"
+	bl_options = {'REGISTER'}
+	
+	def invoke(self, context, event):
+		return context.window_manager.invoke_props_dialog(self)
+	
+	def draw(self, context):
+		pass
+	
+	def execute(self, context):
+		response = urllib.request.urlopen("https://github.com/meta-androcto/materials_library/archive/master.zip")
+		tempDir = bpy.app.tempdir
+		zipPath = os.path.join(tempDir, "master.zip")
+		addonDir = os.path.dirname(__file__)
+		f = open(zipPath, "wb")
+		f.write(response.read())
+		f.close()
+		zf = zipfile.ZipFile(zipPath, "r")
+		for f in zf.namelist():
+			if not os.path.basename(f):
+				pass
+			else:
+				if ("materials_library" in f):
+					uzf = open(os.path.join(addonDir, os.path.basename(f)), 'wb')
+					uzf.write(zf.read(f))
+					uzf.close()
+		zf.close()
+		self.report(type={"INFO"}, message="Please restart Blender updated add-ons")
+		return {'FINISHED'}				
+classes = [matlibvxPanel, matlibOperator, matlibLibsMenu, matlibCatsMenu, UpdateMaterialsAddon]
 #print(bpy.context.scene)
 
 def register():
@@ -1025,4 +1066,4 @@ def unregister():
 		bpy.utils.unregister_class(c)
 
 if __name__ == "__main__":
-	register()
+    register()

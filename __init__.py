@@ -21,7 +21,6 @@ bl_info = {
 	"author": "Mackraken",
 	"version": (1, 0, 0),
 	"blender": (2, 77, 0),
-
 	"location": "Properties > Material",
 	"description": "Material Library VX",
 	"warning": "",
